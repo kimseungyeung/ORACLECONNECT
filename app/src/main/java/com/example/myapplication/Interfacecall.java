@@ -7,4 +7,5 @@ public interface Interfacecall {
     public void update(int index, UserData udata);
     public void delete(int index);
     public int returnva(int idx);
+
 }

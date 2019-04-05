@@ -30,13 +30,14 @@ public class Sub1Fragment extends Fragment implements View.OnClickListener {
     EditText edt_id, edt_passowrd, edt_name, edt_age;
     Button btn_add, btn_update, btn_delete, btn_function;
     PreparedStatement pstmt = null;
-    Context context;
-    Interfacecall incall;
+    Context mcontext;
+   private Interfacecall incall;
     public int selectidx = 0;
     RecyclerView ll_recycle;
     Connection connection;
     ArrayList<UserData> ulist;
     CustomAdapter ca;
+    MainActivity mm;
 //    public Sub1Fragment newInstance() {
 //        Sub1Fragment ss = new Sub1Fragment();
 //        Bundle bb = new Bundle();
@@ -55,11 +56,11 @@ public class Sub1Fragment extends Fragment implements View.OnClickListener {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        context = getActivity();
-        incall=(Interfacecall)context;
+        this.incall=(Interfacecall)context;
     }
 
     public void component(View v) {
+        mm = new MainActivity();
         ll_recycle = (RecyclerView) v.findViewById(R.id.lv_user);
         edt_id = (EditText) v.findViewById(R.id.edt_id);
         edt_name = (EditText) v.findViewById(R.id.edt_name);
@@ -73,15 +74,17 @@ public class Sub1Fragment extends Fragment implements View.OnClickListener {
         btn_delete.setOnClickListener(this);
         btn_add.setOnClickListener(this);
         btn_function.setOnClickListener(this);
-        ulist =new ArrayList<>();
+
         initlist();
        ca = new CustomAdapter(ulist,R.layout.item_recycle_list);
       ll_recycle.setAdapter(ca);
-      ll_recycle.setLayoutManager(new LinearLayoutManager(context));
+      ll_recycle.setLayoutManager(new LinearLayoutManager(mcontext));
 //      ll_recycle.setAnimation(new Defa);
+
     }
 
     public void initlist() {
+        ulist =new ArrayList<>();
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
@@ -123,15 +126,17 @@ public class Sub1Fragment extends Fragment implements View.OnClickListener {
 //            delete(4);
                 int ss = incall.returnva(ca.getSelectidx());
                 Toast.makeText(getActivity(), String.valueOf(ss) + "입니다"+String.valueOf(ca.getSelectidx()), Toast.LENGTH_LONG).show();
-//                ca.notifyDataSetChanged();
+                ca.notifyDataSetChanged();
                 break;
             case R.id.btn_update:
                 incall.update(ca.getSelectidx(), null);
-//                ca.notifyDataSetChanged();
+                ca.notifyDataSetChanged();
                 break;
             case R.id.btn_delete:
                 incall.delete(ca.getSelectidx());
-//                ca.notifyDataSetChanged();
+                initlist();
+                ca.setUdatalist(ulist);
+                ca.notifyDataSetChanged();
                 break;
             case R.id.btn_funtion:
                 insertdatadialog();

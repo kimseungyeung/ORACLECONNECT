@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.Context;
 import android.os.StrictMode;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,7 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, Interfacecall {
+public class MainActivity extends FragmentActivity implements  Interfacecall {
 
 
     String InsertSQL = "insert into test(id, name,password,age) values(?, ?, ?, ?)";
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        tab1.setImageResource(R.drawable.common_full_open_on_phone);
 //        TabSpec.setIndicator("tab1", getResources().getDrawable(R.drawable.common_full_open_on_phone));
         tabSpec1.setIndicator(bv);
+        Sub1Fragment ss= new Sub1Fragment();
         tabHost.addTab(tabSpec1,Sub1Fragment.class,null);
         TabHost.TabSpec tabSpec2 =tabHost.newTabSpec("tab2");
         tabSpec2.setIndicator("탭2");
@@ -73,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tabSpec5.setIndicator("탭5");
         tabHost.addTab(tabSpec5,Sub5Fragment.class,null);
         tabHost.setCurrentTab(0);
+
     }
 
     public static Connection createConnection(String driver, String url, String username, String password) throws ClassNotFoundException, SQLException {
@@ -160,8 +163,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void delete(int index) {
-        if (connection != null) {
-            try {
+        try {
+        if (connection == null) {
+            connection=createConnection();
+        }
+
+
                 if (connection.isClosed()) {
                     connection = createConnection();
                 }
@@ -176,13 +183,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.e("실패", e.getMessage().toString());
 
             }
-        }
+
     }
 
     public int returnva(int idx) {
         int s = 0;
-        if (connection != null) {
-            try {
+        try {
+        if (connection == null) {
+            connection=createConnection();
+        }
+
                 if (connection.isClosed()) {
                     connection = createConnection();
                 }
@@ -200,18 +210,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return 0;
             }
 
-        }
-        try {
-            connection.close();
-        } catch (Exception e) {
 
-        }
-        return 0;
-    }
 
-    @Override
-    public void onClick(View v) {
 
     }
+
 }
 

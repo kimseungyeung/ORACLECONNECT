@@ -16,6 +16,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.Holder> {
     private ArrayList<UserData> udatalist;
     private int itemlayout;
     private int selectidx=0;
+
     public  CustomAdapter(ArrayList<UserData> udl, int ilayout){
         this.udatalist=udl;
         this.itemlayout=ilayout;
@@ -46,7 +47,9 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.Holder> {
     public int getSelectidx() {
         return this.selectidx;
     }
-
+    public void setUdatalist(ArrayList<UserData> uu){
+        this.udatalist=uu;
+    }
     @Override
     public int getItemCount() {
         return udatalist.size();
