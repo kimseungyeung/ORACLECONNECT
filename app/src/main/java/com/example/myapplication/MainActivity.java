@@ -1,14 +1,20 @@
 package com.example.myapplication;
 
+import android.content.Context;
 import android.os.StrictMode;
+import android.support.v4.app.FragmentTabHost;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.myapplication.Data.UserData;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,11 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class MainActivity extends AppCompatActivity {
-    TextView tv_name;
-    EditText edt_id, edt_passowrd, edt_name, edt_age;
-    Button btn_add;
-    PreparedStatement pstmt = null;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Interfacecall {
+
 
     String InsertSQL = "insert into test(id, name,password,age) values(?, ?, ?, ?)";
     String UpdateSQL = "update test set ";
@@ -32,56 +35,44 @@ public class MainActivity extends AppCompatActivity {
     private static final String DEFAULT_USERNAME = "seungyeung";
     private static final String DEFAULT_PASSWORD = "tmddud";
     private Connection connection;
+    PreparedStatement pstmt = null;
+    int selectidx = 0;
+    FragmentTabHost tabHost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         component();
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
 
-
-        try {
-            this.connection = createConnection();
-            //e.Log("Connected");
-            Statement stmt = connection.createStatement();
-
-            ResultSet rs = stmt.executeQuery("select * from test");
-            while (rs.next()) {
-                System.out.println("hello : " + rs.getString(1));
-                tv_name.append(rs.getString("Name"));
-            }
-            connection.close();
-        } catch (Exception e) {
-            //e.Log(""+e);
-            e.printStackTrace();
-        }
     }
 
     public void component() {
-        tv_name = (TextView) findViewById(R.id.tv_name);
-        edt_id = (EditText) findViewById(R.id.edt_id);
-        edt_name = (EditText) findViewById(R.id.edt_name);
-        edt_passowrd = (EditText) findViewById(R.id.edt_password);
-        edt_age = (EditText) findViewById(R.id.edt_age);
-        btn_add = (Button) findViewById(R.id.btn_add);
-        btn_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String id = edt_id.getText().toString();
-                String name = edt_name.getText().toString();
-                String password = edt_passowrd.getText().toString();
-                String age = edt_age.getText().toString();
-//            insert(id,name,password,age);
-//            update(2);
-//            delete(4);
-                int ss = returnva();
-                Toast.makeText(getApplicationContext(), String.valueOf(ss) + "입니다", Toast.LENGTH_LONG).show();
-            }
-        });
+        tabHost =(FragmentTabHost)findViewById(R.id.tabhost);
+        tabHost.setup(this,getSupportFragmentManager(),R.id.tabcontent);
+        TabHost.TabSpec tabSpec1 =tabHost.newTabSpec("tab1");
+//        tabSpec1.setIndicator("탭1");
+        LayoutInflater li = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+
+        View bv = li.inflate(R.layout.tabbutton, null);
+//        tab1.setImageResource(R.drawable.common_full_open_on_phone);
+//        TabSpec.setIndicator("tab1", getResources().getDrawable(R.drawable.common_full_open_on_phone));
+        tabSpec1.setIndicator(bv);
+        tabHost.addTab(tabSpec1,Sub1Fragment.class,null);
+        TabHost.TabSpec tabSpec2 =tabHost.newTabSpec("tab2");
+        tabSpec2.setIndicator("탭2");
+        tabHost.addTab(tabSpec2,Sub2Fragment.class,null);
+        TabHost.TabSpec tabSpec3 =tabHost.newTabSpec("tab3");
+        tabSpec3.setIndicator("탭3");
+        tabHost.addTab(tabSpec3,Sub3Fragment.class,null);
+        TabHost.TabSpec tabSpec4 =tabHost.newTabSpec("tab4");
+        tabSpec4.setIndicator("탭4");
+        tabHost.addTab(tabSpec4,Sub4Fragment.class,null);
+        TabHost.TabSpec tabSpec5 =tabHost.newTabSpec("tab5");
+        tabSpec5.setIndicator("탭5");
+        tabHost.addTab(tabSpec5,Sub5Fragment.class,null);
+        tabHost.setCurrentTab(0);
     }
 
     public static Connection createConnection(String driver, String url, String username, String password) throws ClassNotFoundException, SQLException {
@@ -94,17 +85,17 @@ public class MainActivity extends AppCompatActivity {
         return createConnection(DEFAULT_DRIVER, DEFAULT_URL, DEFAULT_USERNAME, DEFAULT_PASSWORD);
     }
 
-    public void insert(String id, String name, String password, String age) {
+    public void insert(UserData udata) {
         if (connection != null) {
             try {
                 if (connection.isClosed()) {
                     connection = createConnection();
                 }
                 pstmt = connection.prepareStatement(InsertSQL);
-                pstmt.setString(1, edt_id.getText().toString());
-                pstmt.setString(2, edt_name.getText().toString());
-                pstmt.setString(3, edt_passowrd.getText().toString());
-                pstmt.setString(4, edt_age.getText().toString());
+                pstmt.setString(1, udata.getId());
+                pstmt.setString(2, udata.getName());
+                pstmt.setString(3, udata.getPassword());
+                pstmt.setString(4, String.valueOf(udata.getAge()));
                 int r = pstmt.executeUpdate();
                 connection.close();
             } catch (Exception e) {
@@ -115,11 +106,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void update(int index) {
-        String id = edt_id.getText().toString().trim();
-        String name = edt_name.getText().toString().trim();
-        String password = edt_passowrd.getText().toString().trim();
-        String age = edt_age.getText().toString().trim();
+    public void update(int index, UserData udata) {
+        String id = udata.getId();
+        String name = udata.getName();
+        String password = udata.getPassword();
+        String age = String.valueOf(udata.getAge());
         if (connection != null) {
             try {
                 if (connection.isClosed()) {
@@ -188,16 +179,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public int returnva() {
+    public int returnva(int idx) {
         int s = 0;
         if (connection != null) {
             try {
                 if (connection.isClosed()) {
                     connection = createConnection();
                 }
-                String df = "SELECT func_return(3) FROM DUAL";
+                String df = "SELECT func_return(" + String.valueOf(idx) + ") FROM DUAL";
                 pstmt = connection.prepareStatement(df);
-//                pstmt.setString(1,"4");
 
                 ResultSet rs = pstmt.executeQuery();
                 while (rs.next()) {
@@ -213,11 +203,15 @@ public class MainActivity extends AppCompatActivity {
         }
         try {
             connection.close();
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
         return 0;
     }
 
+    @Override
+    public void onClick(View v) {
+
     }
+}
 
